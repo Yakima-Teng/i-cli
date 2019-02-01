@@ -2,14 +2,14 @@
 
 ``` bash
 # 请将<template-name>替换为具体的模板名，将<project-name>替换为具体的项目名
-i clone <template-name> <project-name>
+i init <template-name> <project-name>
 ```
 
 在上述命令中，你也可以使用你自己的模版，或者其他开发者提供的模板，下面是自定义模版的使用方法：
 
-- 如果你的模板项目已经上传到github上，可以通过`i clone <username/repo> <project-name>`的方式使用模板文件，如果你要使用非master分支的代码，可以直接`i clone "<username/repo#branch>" <project-name>`（注意：后面这种写法里，`""`不可以省略，因为`#`在zsh shells中有特殊意义）。
+- 如果你的模板项目已经上传到github上，可以通过`i init <username/repo> <project-name>`的方式使用模板文件，如果你要使用非master分支的代码，可以直接`i init "<username/repo#branch>" <project-name>`（注意：后面这种写法里，`""`不可以省略，因为`#`在zsh shells中有特殊意义）。
 
-- 如果你要使用的模板文件存在于本地电脑上，可以通过`i clone ~/fs/path/to-custom-template my-project`的方式使用模板文件。
+- 如果你要使用的模板文件存在于本地电脑上，可以通过`i init ~/fs/path/to-custom-template my-project`的方式使用模板文件。
 
 ***需要注意的是，你的模板项目需要满足以下条件，否则无法配合`i-cli`进行使用：***
 

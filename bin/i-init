@@ -1,0 +1,146 @@
+#!/usr/bin/env node
+
+const download = require('download-git-repo')
+const program = require('commander')
+const exists = require('fs').existsSync
+const path = require('path')
+const ora = require('ora')
+const home = require('user-home')
+const tildify = require('tildify')
+const chalk = require('chalk')
+const inquirer = require('inquirer')
+const rm = require('rimraf').sync
+const logger = require('../lib/logger')
+const generate = require('../lib/generate')
+const checkVersion = require('../lib/check-version')
+const localPath = require('../lib/local-path')
+
+const isLocalPath = localPath.isLocalPath
+const getTemplatePath = localPath.getTemplatePath
+const log = console.log
+
+/**
+ * usage
+ */
+program.usage('<template-name> [project-name]')
+  .option('-c, --clone', 'use git clone')
+  .option('--offline', 'use cached template')
+
+/**
+ * help
+ */
+program.on('--help', () => {
+  log('  Examples:')
+  log()
+  log(chalk.gray('    # create a new project with an official template'))
+  log('    $ i init template-name my-project')
+  log()
+  log(chalk.gray('    # create a new project straight from a github template'))
+  log('    $ i init username/repo my-project')
+  log()
+})
+
+/**
+ * help
+ */
+function help () {
+  program.parse(process.argv)
+  if (program.args.length < 1) {
+    return program.help()
+  }
+}
+help()
+
+/**
+ * settings
+ */
+let template = program.args[0]
+
+// 若模板名不含`/`则认为是官方模版
+const hasSlash = template.indexOf('/') > -1
+if (!hasSlash) {
+  template = `i-template-${template}`
+}
+// 如果`i init template-name project-name`命令中缺失`project-name`参数或值为`.`，则直接使用当前路径来存放渲染后的模版文件
+const rawName = program.args[1]
+const inPlace = !rawName || rawName === '.'
+const name = inPlace ? path.relative('../', process.cwd()) : rawName
+const to = path.resolve(rawName || '.')
+const clone = program.clone || false
+
+const tmp = path.join(home, '.i-templates', template.replace(/[\/:]/g, '-'))
+if (program.offline) {
+  // tildify: Convert an absolute path to a tilde path: /Users/sindresorhus/dev → ~/dev
+  console.log(`> Use cached template at ${chalk.yellow(tildify(tmp))}`)
+  template = tmp
+}
+
+/**
+ * padding
+ */
+log()
+process.on('exit', () => {
+  log()
+})
+
+if (inPlace || exists(to)) {
+  inquirer.prompt([
+    {
+      type: 'confirm',
+      message: inPlace
+        ? '是否直接在当前目录创建新项目？'
+        : '目标目录已存在，是否继续？',
+      name: 'ok'
+    }
+  ]).then(answers => {
+    answers.ok && run()
+  }).catch(logger.fatal)
+} else {
+  run()
+}
+
+function run () {
+  // check if template is local
+  if (isLocalPath(template)) {
+    const templatePath = getTemplatePath(template)
+    if (exists(templatePath)) {
+      generate(name, templatePath, to, err => {
+        if (err) {
+          logger.fatal(err)
+        }
+        log()
+        logger.success('成功创建 "%s"。', name)
+      })
+    } else {
+      logger.fatal('未找到本地模板： "%s"。', template)
+    }
+  } else {
+    checkVersion(() => {
+      if (!hasSlash) {
+        // use official template
+        const officialTemplate = 'Yakima-Teng/' + template
+        downloadAndGenerate(officialTemplate)
+      } else {
+        downloadAndGenerate(template)
+      }
+    })
+  }
+}
+
+function downloadAndGenerate (template) {
+  const spinner = ora('下载模板中...')
+  spinner.start()
+  // Remove if local template exists
+  if (exists(tmp)) {
+    rm(tmp)
+  }
+  download(template, tmp, { clone }, err => {
+    spinner.stop()
+    err && logger.fatal('下载模板文件"' + template + '"失败: ' + err.message.trim())
+    generate(name, tmp, to, err => {
+      err && logger.fatal(err)
+      log()
+      logger.success('成功创建"%s"', name)
+    })
+  })
+}

@@ -36,7 +36,7 @@ npm install -g i-cli
 
 ``` bash
 # 请将<template-name>替换为具体的模板名，将<project-name>替换为具体的项目名
-i clone <template-name> <project-name>
+i init <template-name> <project-name>
 ```
 
 以上命令会从`https://github.com/Yakima-Teng/i-template-<template-name>`拉取代码，通常还有带有一些简单的问题，根据实际需求回答后就会发现在当前路径下已经自动创建好了一个名为<project-name>的项目目录。
