@@ -24,7 +24,7 @@
 - npm (3及以上版本)；
 - git。
 
-i-cli需要全局安装，安装完毕后就可以直接在终端中使用`i`命令了。
+`i-cli`需要全局安装，安装完毕后就可以直接在终端中使用`i`命令了。
 
 ``` bash
 npm install -g i-cli
@@ -47,7 +47,7 @@ i clone <template-name> <project-name>
 i list templates
 ```
 
-#### 当前支持的官方模板
+***当前支持的官方模板***
 
 官方模板名采用`<框架名或构建工具名>-<多页应用还是单页应用>-<PC站还是wap站>`的方式命令。
 
@@ -55,16 +55,16 @@ i list templates
 
 - [react-mpa-wap](https://github.com/Yakima-Teng/i-template-react-mpa-wap) - 一个使用gulp搭建的，支持页面自动刷新、代码eslint检查、 转发本地请求等特性的多页应用模板，用于wap站。
 
-#### 使用自定义模板
+***使用自定义模板***
 
 具体参考本文：[使用自定义模板](./docs/custom-template.md)
 
-### 鸣谢
+## 鸣谢
 
 本项目代码 ***极大*** 地参考了下述项目的代码实现：
 
 - [vue-cli (version 2+)](https://github.com/vuejs/vue-cli)
 
-### License
+## License
 
 [MIT](http://opensource.org/licenses/MIT)
